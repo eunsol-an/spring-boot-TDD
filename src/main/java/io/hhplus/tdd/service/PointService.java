@@ -1,8 +1,6 @@
 package io.hhplus.tdd.service;
 
-import io.hhplus.tdd.controller.dto.ChargeHistoryRequest;
-import io.hhplus.tdd.controller.dto.ChargePointRequest;
-import io.hhplus.tdd.controller.dto.ChargePointResponse;
+import io.hhplus.tdd.controller.dto.*;
 import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.UserPoint;
 import io.hhplus.tdd.repository.PointHistoryPort;
@@ -28,7 +26,7 @@ public class PointService {
         UserPoint saved = pointPort.save(updated);
 
         // 유저 포인트 기록 저장
-        ChargeHistoryRequest historyRequest = new ChargeHistoryRequest(request.userId(), request.amount(), TransactionType.CHARGE, System.currentTimeMillis());
+        PointHistoryRequest historyRequest = new PointHistoryRequest(request.userId(), request.amount(), TransactionType.CHARGE, System.currentTimeMillis());
         pointHistoryPort.save(historyRequest);
 
         // 응답 객체 반환

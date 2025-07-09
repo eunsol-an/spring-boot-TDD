@@ -1,7 +1,7 @@
 package io.hhplus.tdd.repository;
 
 import io.hhplus.tdd.database.PointHistoryTable;
-import io.hhplus.tdd.controller.dto.ChargeHistoryRequest;
+import io.hhplus.tdd.controller.dto.PointHistoryRequest;
 import io.hhplus.tdd.point.PointHistory;
 
 public class PointHistoryAdapter implements PointHistoryPort {
@@ -12,7 +12,7 @@ public class PointHistoryAdapter implements PointHistoryPort {
     }
 
     @Override
-    public PointHistory save(ChargeHistoryRequest request) {
+    public PointHistory save(PointHistoryRequest request) {
         return pointHistoryRepository.insert(request.userId(), request.amount(), request.transactionType(), System.currentTimeMillis());
     }
 }
