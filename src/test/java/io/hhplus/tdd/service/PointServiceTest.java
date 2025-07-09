@@ -2,10 +2,13 @@ package io.hhplus.tdd.service;
 
 import io.hhplus.tdd.controller.dto.ChargePointRequest;
 import io.hhplus.tdd.controller.dto.ChargePointResponse;
+import io.hhplus.tdd.controller.dto.UsePointRequest;
+import io.hhplus.tdd.controller.dto.UsePointResponse;
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
 import io.hhplus.tdd.point.PointHistory;
 import io.hhplus.tdd.point.TransactionType;
+import io.hhplus.tdd.point.UserPoint;
 import io.hhplus.tdd.repository.PointAdapter;
 import io.hhplus.tdd.repository.PointHistoryAdapter;
 import io.hhplus.tdd.repository.PointHistoryPort;
@@ -85,4 +88,49 @@ public class PointServiceTest {
             assertEquals(TransactionType.CHARGE, historyList.get(0).type());
         }
     }
+
+    @Nested
+    @DisplayName("포인트 사용 시")
+    class UsePoint {
+        @Test
+        @DisplayName("정상적으로 포인트가 차감된다")
+        void 포인트사용() {
+            UserPoint initialUserPoint = pointRepository.insertOrUpdate(1L, 1000L);
+            final UsePointRequest request = PointSteps.포인트사용요쳥_생성(1L, 500L);
+
+            UsePointResponse used = pointService.use(request);
+
+            assertEquals(request.userId(), used.userId());
+            assertEquals(request.amount(), used.point());
+            assertEquals(initialUserPoint.point() - request.amount(), used.point());
+        }
+
+        @Test
+        @DisplayName("잔액 부족시 예외가 발생한다")
+        void 포인트사용_잔고부족_예외() {
+            UserPoint initialUserPoint = pointRepository.insertOrUpdate(1L, 500L);
+            assertEquals(500L, initialUserPoint.point());
+
+            assertThrows(IllegalArgumentException.class, () -> {
+                pointService.use(PointSteps.포인트사용요쳥_생성(1L, 1000L));
+            });
+
+        }
+
+        @Test
+        @DisplayName("사용 내역이 히스토리에 저장된다")
+        void 포인트사용_히스토리() {
+            UserPoint initialUserPoint = pointRepository.insertOrUpdate(1L, 1000L);
+            final UsePointRequest request = PointSteps.포인트사용요쳥_생성(1L, 500L);
+
+            UsePointResponse used = pointService.use(request);
+
+            assertEquals(initialUserPoint.point() - request.amount(), used.point());
+            List<PointHistory> historyList = pointHistoryRepository.selectAllByUserId(used.userId());
+            assertEquals(1, historyList.size());
+            assertEquals(request.amount(), historyList.get(0).amount());
+            assertEquals(TransactionType.USE, historyList.get(0).type());
+        }
+    }
+
 }
