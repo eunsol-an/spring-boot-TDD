@@ -49,4 +49,9 @@ public class PointService {
 
         return new UsePointResponse(saved.id(), saved.point(), saved.updateMillis());
     }
+
+    public GetPointResponse get(long userId) {
+        final UserPoint userPoint = pointPort.getUserPoint(userId);
+        return new GetPointResponse(userPoint.id(), userPoint.point(), userPoint.updateMillis());
+    }
 }
