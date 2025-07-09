@@ -32,4 +32,21 @@ public class PointService {
         // 응답 객체 반환
         return new ChargePointResponse(saved.id(), saved.point(), saved.updateMillis());
     }
+
+    public UsePointResponse use(UsePointRequest request) {
+        // 유저 포인트 조회
+        UserPoint userPoint = pointPort.getUserPoint(request.userId());
+
+        // 포인트 사용
+        UserPoint updated = userPoint.use(request.amount());
+
+        // 유저 포인트 저장
+        UserPoint saved = pointPort.save(updated);
+
+        // 유저 포인트 기록 저장
+        PointHistoryRequest historyRequest = new PointHistoryRequest(request.userId(), request.amount(), TransactionType.USE, System.currentTimeMillis());
+        pointHistoryPort.save(historyRequest);
+
+        return new UsePointResponse(saved.id(), saved.point(), saved.updateMillis());
+    }
 }
