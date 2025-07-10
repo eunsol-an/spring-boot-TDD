@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("UserPoint 도메인 테스트")
-
 class UserPointTest {
 
     @Nested

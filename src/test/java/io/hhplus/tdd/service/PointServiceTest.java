@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("PointService 테스트")
-
 public class PointServiceTest {
 
     private PointService pointService;
@@ -80,7 +79,7 @@ public class PointServiceTest {
             ChargePointResponse charged = pointService.charge(request);
 
             List<PointHistory> historyList = pointHistoryRepository.selectAllByUserId(charged.userId());
-            assertEquals(1, historyList.size());
+            assertThat(historyList).hasSize(1);
             assertEquals(request.amount(), historyList.get(0).amount());
             assertEquals(TransactionType.CHARGE, historyList.get(0).type());
         }
@@ -124,7 +123,7 @@ public class PointServiceTest {
 
             assertEquals(initialUserPoint.point() - request.amount(), used.point());
             List<PointHistory> historyList = pointHistoryRepository.selectAllByUserId(used.userId());
-            assertEquals(1, historyList.size());
+            assertThat(historyList).hasSize(1);
             assertEquals(request.amount(), historyList.get(0).amount());
             assertEquals(TransactionType.USE, historyList.get(0).type());
         }
