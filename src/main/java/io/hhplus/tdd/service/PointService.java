@@ -1,10 +1,13 @@
 package io.hhplus.tdd.service;
 
 import io.hhplus.tdd.controller.dto.*;
+import io.hhplus.tdd.point.PointHistory;
 import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.UserPoint;
 import io.hhplus.tdd.repository.PointHistoryPort;
 import io.hhplus.tdd.repository.PointPort;
+
+import java.util.List;
 
 public class PointService {
     private final PointPort pointPort;
@@ -53,5 +56,18 @@ public class PointService {
     public GetPointResponse get(long userId) {
         final UserPoint userPoint = pointPort.getUserPoint(userId);
         return new GetPointResponse(userPoint.id(), userPoint.point(), userPoint.updateMillis());
+    }
+
+    public List<GetPointHistoryResponse> getHistoryList(long userId) {
+        List<PointHistory> pointHistoryList = pointHistoryPort.getPointHistoryList(userId);
+        return pointHistoryList.stream()
+                .map(pointHistory -> new GetPointHistoryResponse(
+                        pointHistory.id(),
+                        pointHistory.userId(),
+                        pointHistory.amount(),
+                        pointHistory.type(),
+                        pointHistory.updateMillis()
+                ))
+                .toList();
     }
 }

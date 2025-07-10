@@ -4,6 +4,8 @@ import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.controller.dto.PointHistoryRequest;
 import io.hhplus.tdd.point.PointHistory;
 
+import java.util.List;
+
 public class PointHistoryAdapter implements PointHistoryPort {
     private final PointHistoryTable pointHistoryRepository;
 
@@ -14,5 +16,10 @@ public class PointHistoryAdapter implements PointHistoryPort {
     @Override
     public PointHistory save(PointHistoryRequest request) {
         return pointHistoryRepository.insert(request.userId(), request.amount(), request.transactionType(), System.currentTimeMillis());
+    }
+
+    @Override
+    public List<PointHistory> getPointHistoryList(long userId) {
+        return pointHistoryRepository.selectAllByUserId(userId);
     }
 }
