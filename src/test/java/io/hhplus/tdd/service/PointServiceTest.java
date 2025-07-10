@@ -133,7 +133,7 @@ public class PointServiceTest {
     @DisplayName("포인트 조회 시")
     class GetPoint {
         @Test
-        @DisplayName("포인트 충전 후, 포인트가 정상적으로 조회한다")
+        @DisplayName("포인트 충전 후, 포인트가 정상적으로 조회된다")
         void 포인트조회() {
             final ChargePointRequest request = PointSteps.포인트충전요청_생성(1L, 1000L);
             pointService.charge(request);
