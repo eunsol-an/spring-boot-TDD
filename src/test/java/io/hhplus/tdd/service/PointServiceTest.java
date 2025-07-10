@@ -1,9 +1,6 @@
 package io.hhplus.tdd.service;
 
-import io.hhplus.tdd.controller.dto.ChargePointRequest;
-import io.hhplus.tdd.controller.dto.ChargePointResponse;
-import io.hhplus.tdd.controller.dto.UsePointRequest;
-import io.hhplus.tdd.controller.dto.UsePointResponse;
+import io.hhplus.tdd.controller.dto.*;
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
 import io.hhplus.tdd.point.PointHistory;
@@ -133,4 +130,31 @@ public class PointServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("포인트 조회 시")
+    class GetPoint {
+        @Test
+        @DisplayName("포인트 충전 후, 포인트가 정상적으로 조회한다")
+        void 포인트조회() {
+            final ChargePointRequest request = PointSteps.포인트충전요청_생성(1L, 1000L);
+            pointService.charge(request);
+            final long userId = 1L;
+
+            GetPointResponse response =  pointService.get(userId);
+
+            assertEquals(userId, response.userId());
+            assertEquals(request.amount(), response.point());
+        }
+
+        @Test
+        @DisplayName("충전 이력이 없는 유저는 포인트가 0으로 조회된다")
+        void 포인트조회_이력없음() {
+            final long userId = 999L;
+
+            GetPointResponse response =  pointService.get(userId);
+
+            assertEquals(userId, response.userId());
+            assertEquals(0L, response.point());
+        }
+    }
 }
