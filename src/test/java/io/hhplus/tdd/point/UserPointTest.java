@@ -2,7 +2,9 @@ package io.hhplus.tdd.point;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,38 +14,45 @@ class UserPointTest {
     @Nested
     @DisplayName("포인트 충전 시")
     class ChargePoint {
-        @Test
+        @ParameterizedTest(name = "충전 금액이 {0}원 이상이면 정상적으로 충전된다")
+        @ValueSource(longs = {1, 500, 999})
         @DisplayName("정상적으로 포인트가 충전된다")
-        void 포인트_충전() {
+        void 포인트_충전(long validAmount) {
             // given
             UserPoint userPoint = new UserPoint(1L, 1000L, System.currentTimeMillis());
 
             // when
-            UserPoint charged = userPoint.charge(500L);
+            UserPoint charged = userPoint.charge(validAmount);
 
             // then
-            assertEquals(1500L, charged.point());
+            assertEquals(1000L + validAmount, charged.point());
         }
 
-        @Test
-        @DisplayName("음수 금액으로 충전시 예외가 발생한다")
-        void 충전금액_음수_예외() {
+        @ParameterizedTest(name = "{0}원을 충전하면 예외가 발생한다")
+        @ValueSource(longs = {0, -100})
+        @DisplayName("0원 이하 금액으로 충전시 예외가 발생한다")
+        void 충전금액_경계값_예외(long invalidAmount) {
             // given
             UserPoint userPoint = new UserPoint(1L, 1000L, System.currentTimeMillis());
 
             // expect
             assertThrows(IllegalArgumentException.class, () -> {
-                userPoint.charge(-100L);
+                userPoint.charge(invalidAmount);
             });
         }
 
-        @Test
+        @ParameterizedTest(name = "기존 포인트 {0}원 + 충전 {1}원 이면 예외가 발생한다")
+        @CsvSource({
+                "99999,2",
+                "100000,1",
+                "95000,6000"
+        })
         @DisplayName("최대 잔고 금액 초과 충전시 예외가 발생한다")
-        void 최대잔고_초과_예외() {
-            UserPoint userPoint = new UserPoint(1L, 90000L, System.currentTimeMillis());
+        void 최대잔고_초과_예외(long currentPoint, long chargeAmount) {
+            UserPoint userPoint = new UserPoint(1L, currentPoint, System.currentTimeMillis());
 
             assertThrows(IllegalArgumentException.class, () -> {
-                userPoint.charge(20000L);
+                userPoint.charge(chargeAmount);
             });
         }
 
@@ -53,23 +62,29 @@ class UserPointTest {
     @Nested
     @DisplayName("포인트 사용 시")
     class UsePoint {
-        @Test
+        @ParameterizedTest(name = "사용 금액이 {0}원 이상이면 정상적으로 차감된다")
+        @ValueSource(longs = {1, 500, 1000})
         @DisplayName("정상적으로 포인트가 차감된다")
-        void 포인트_사용() {
+        void 포인트_사용(long validAmount) {
             UserPoint userPoint = new UserPoint(1L, 1000L, System.currentTimeMillis());
 
-            UserPoint used = userPoint.use(300L);
+            UserPoint used = userPoint.use(validAmount);
 
-            assertEquals(700L, used.point());
+            assertEquals(1000L - validAmount, used.point());
         }
 
-        @Test
-        @DisplayName("잔액 부족시 예외가 발생한다")
-        void 포인트_부족_예외() {
-            UserPoint userPoint = new UserPoint(1L, 500L, System.currentTimeMillis());
+        @ParameterizedTest(name = "보유 금액 {0}원, 사용 금액 {1}원 이면 예외가 발생한다")
+        @CsvSource({
+                "1000,1001",
+                "500,1000",
+                "0,1"
+        })
+        @DisplayName("잔액보다 큰 금액을 사용하면 예외가 발생한다")
+        void 포인트_부족_예외(long currentPoint, long useAmount) {
+            UserPoint userPoint = new UserPoint(1L, currentPoint, System.currentTimeMillis());
 
             assertThrows(IllegalArgumentException.class, () -> {
-                userPoint.use(1000L);
+                userPoint.use(useAmount);
             });
         }
     }
