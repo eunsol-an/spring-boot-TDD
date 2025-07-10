@@ -7,5 +7,9 @@ package io.hhplus.tdd.point;
  * - USE : 사용
  */
 public enum TransactionType {
-    CHARGE, USE
+    CHARGE, USE;
+
+    public boolean isSameType(TransactionType other) {
+        return this == other;
+    }
 }
