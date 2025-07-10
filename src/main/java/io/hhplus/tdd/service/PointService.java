@@ -29,10 +29,8 @@ public class PointService {
         UserPoint saved = pointPort.save(updated);
 
         // 유저 포인트 기록 저장
-        PointHistoryRequest historyRequest = new PointHistoryRequest(request.userId(), request.amount(), TransactionType.CHARGE, System.currentTimeMillis());
-        pointHistoryPort.save(historyRequest);
+        saveHistory(request.userId(), request.amount(), TransactionType.CHARGE);
 
-        // 응답 객체 반환
         return new ChargePointResponse(saved.id(), saved.point(), saved.updateMillis());
     }
 
@@ -47,8 +45,7 @@ public class PointService {
         UserPoint saved = pointPort.save(updated);
 
         // 유저 포인트 기록 저장
-        PointHistoryRequest historyRequest = new PointHistoryRequest(request.userId(), request.amount(), TransactionType.USE, System.currentTimeMillis());
-        pointHistoryPort.save(historyRequest);
+        saveHistory(request.userId(), request.amount(), TransactionType.USE);
 
         return new UsePointResponse(saved.id(), saved.point(), saved.updateMillis());
     }
@@ -69,5 +66,10 @@ public class PointService {
                         pointHistory.updateMillis()
                 ))
                 .toList();
+    }
+
+    private void saveHistory(long userId, long amount, TransactionType type) {
+        PointHistoryRequest historyRequest = new PointHistoryRequest(userId, amount, type, System.currentTimeMillis());
+        pointHistoryPort.save(historyRequest);
     }
 }
