@@ -6,9 +6,11 @@ import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.UserPoint;
 import io.hhplus.tdd.repository.PointHistoryPort;
 import io.hhplus.tdd.repository.PointPort;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class PointService {
     private final PointPort pointPort;
     private final PointHistoryPort pointHistoryPort;

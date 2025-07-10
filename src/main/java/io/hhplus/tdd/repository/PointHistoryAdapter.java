@@ -3,9 +3,11 @@ package io.hhplus.tdd.repository;
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.controller.dto.PointHistoryRequest;
 import io.hhplus.tdd.point.PointHistory;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class PointHistoryAdapter implements PointHistoryPort {
     private final PointHistoryTable pointHistoryRepository;
 

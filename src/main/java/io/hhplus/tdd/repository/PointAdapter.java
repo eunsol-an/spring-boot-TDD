@@ -2,7 +2,9 @@ package io.hhplus.tdd.repository;
 
 import io.hhplus.tdd.database.UserPointTable;
 import io.hhplus.tdd.point.UserPoint;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PointAdapter implements PointPort {
     private final UserPointTable pointRepository;
 
