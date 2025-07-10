@@ -157,4 +157,39 @@ public class PointServiceTest {
             assertEquals(0L, response.point());
         }
     }
+
+    @Nested
+    @DisplayName("포인트 충전/사용 내역 조회 시")
+    class GetPointHistory {
+        @Test
+        @DisplayName("포인트 충전과 사용 후, 히스토리 2건이 정상적으로 조회된다")
+        void 포인트내역조회() {
+            // 포인트 충전, 사용
+            final long userId = 1L;
+            final long chargeAmount = 1000L;
+            final long useAmount = 500L;
+            pointService.charge(PointSteps.포인트충전요청_생성(userId, chargeAmount));
+            pointService.use(PointSteps.포인트사용요쳥_생성(userId, useAmount));
+
+            // 포인트 내역 조회
+            List<GetPointHistoryResponse> historyList = pointService.getHistoryList(userId);
+
+            // 검증
+            assertThat(historyList).hasSize(2);
+            assertThat(historyList.get(0).type()).isEqualTo(TransactionType.CHARGE);
+            assertThat(historyList.get(1).type()).isEqualTo(TransactionType.USE);
+            assertThat(historyList).extracting(GetPointHistoryResponse::amount)
+                    .containsExactlyInAnyOrder(chargeAmount, useAmount);
+        }
+
+        @Test
+        @DisplayName("히스토리가 없을 경우 빈 리스트를 반환한다")
+        void 포인트내역조회_이력없음() {
+            final long userId = 999L;
+
+            List<GetPointHistoryResponse> historyList = pointService.getHistoryList(userId);
+
+            assertThat(historyList).isEmpty();
+        }
+    }
 }
